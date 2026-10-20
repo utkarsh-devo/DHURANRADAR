@@ -1,181 +1,244 @@
-Conversation Log
-backend build the frontend using flutter /dart communicating properly with the backend and the files are properly distributed 
-📱 DhuanRadar Flutter Frontend Built & Integrated
+# 🌫️ DhuanRadar - Backend API
 
-The complete frontend application has been built in Flutter & Dart in your project directory C:\dev\flutter_projects\dhuanrader (and synced with c:\Users\utkar\OneDrive\Attachments\Desktop\backend\frontend).
-
-It follows a clean, production-grade layered architecture with seamless communication to your FastAPI backend.
-
-📂 File Structure & Distribution
-lib/
-├── main.dart                       # App entry point, MultiProvider & Material 3 Theme
-├── constants/
-│   ├── api_constants.dart          # Base URLs (Android 10.0.2.2, Web/Desktop localhost, runtime override)
-│   └── app_colors.dart             # Risk & Confidence colors matching ByteForge deck tokens
-├── models/
-│   ├── briefing_model.dart         # BriefingResponse, ScoringDetails, ExposureArea, UITheme
-│   ├── weather_model.dart          # WeatherData, WindVector (10m Open-Meteo)
-│   ├── hotspot_model.dart          # Hotspot, HotspotSummary (NASA FIRMS / Sample CSV)
-│   ├── advisory_model.dart         # AdvisoryModel (TinyFish official health guidance)
-│   └── report_model.dart           # FieldReport, DownwindRelayAlert
-├── services/
-│   └── api_service.dart            # HTTP client for FastAPI endpoints with error resilience
-├── providers/
-│   ├── briefing_provider.dart      # State management for briefings, regions & English/Hindi toggle
-│   └── report_provider.dart        # State management for one-tap ground checks & downwind relay
-├── widgets/
-│   ├── risk_card.dart              # Main Risk & Confidence card with explainable reason & next steps
-│   ├── exposure_area_card.dart     # Coarse area radar diagram (Slide 3: "Coarse area, not a smoke path")
-│   ├── weather_wind_card.dart      # 10m wind speed, direction, & calm air notice (<5 km/h)
-│   ├── official_advisory_card.dart # TinyFish verified advisory card with source link & disclaimer
-│   ├── downwind_relay_card.dart    # Unverified downwind relay alert banner (Slide 7)
-│   ├── ground_check_bar.dart       # One-tap field report bar ("Fire nearby", "Heavy smoke", etc.)
-│   └── language_toggle.dart        # English / Hindi (En / अ) switcher
-└── screens/
-    ├── home_screen.dart            # Main container with ASHA/ANM header & Bottom Navigation Bar
-    ├── briefing_tab.dart           # The primary Evening Briefing screen (Slides 1–6)
-    ├── reports_tab.dart            # Ground checks & field feedback history (Slide 7)
-    └── info_tab.dart               # Rules engine transparency (Slide 5 Example A & B) & connection settings
-🌟 Key Features & Deck Alignment
-
-Evening Smoke Briefing (Slides 1–6):
-
-Village Selector: Pre-configured agricultural locations (Samana Cluster, Ludhiana Rural, Sangrur Farm Cluster, Karnal Block, North Delhi Outskirts).
-Explainable Risk & Confidence: Color-coded badges with exact point breakdowns and transparent reasons.
-Health Worker's Next Step: Highlights actionable community guidance (e.g., "Share the dated official advisory with the village. Watch field reports").
-Exposure Area Visual: Coarse area circle diagram with hotspot counts within 25 km and 50 km.
-10m Wind & Weather: Live wind speed, direction, and calm air notice from Open-Meteo.
-Official Health Advisory: Formatted card displaying TinyFish validated advisories (MoHFW/NCDC) with medical disclaimers.
-
-One-Tap Ground Checks (Slide 7):
-
-Floating interactive chips:
-🔥 Fire nearby
-💨 Heavy smoke
-🌫️ Smoke seen
-✅ No smoke
-Automatically logs field observations to the FastAPI backend (POST /api/v1/reports).
-
-Downwind Relay Alerts (Slide 7):
-
-If an upwind village logs a "Fire nearby" or "Heavy smoke" observation and wind data confirms smoke transport, downstream health workers receive an Unverified Downwind Relay Alert.
-
-Bilingual UI (Hindi / English):
-
-Tap the En / अ button in the top bar to toggle between English and Hindi across the entire UI.
-
-Cross-Platform Networking Configured:
-
-android/app/src/main/AndroidManifest.xml has been updated with android.permission.INTERNET and android:usesCleartextTraffic="true".
-ApiConstants automatically detects whether the app is running on Android emulator (http://10.0.2.2:8000) or Web/Desktop/iOS (http://localhost:8000), with an in-app URL settings editor in the System Rules tab.
-🚀 How to Run Backend & Frontend Together
-Step 1: Start the FastAPI Backend
-
-Open a terminal in c:\Users\utkar\OneDrive\Attachments\Desktop\backend (or C:\dev\flutter_projects\dhuanrader\backend):
-
-bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-
-(Backend documentation will be available at http://localhost:8000/docs)
-
-Step 2: Run the Flutter App
-
-Open a terminal in C:\dev\flutter_projects\dhuanrader:
-
-bash
-# To run on Chrome (Web):
-flutter run -d chrome
-# To run on Windows Desktop:
-flutter run -d windows
-# Or to run on Android Emulator / Physical Device:
-flutter run
-Step 3: Run Flutter Tests
-bash
-flutter test
-
-All widget tests and initial rendering tests pass.
-
-INFO:     Started reloader process [20736] using StatReload
-ERROR:    Error loading ASGI app. Could not import module "main".
-INFO:     Stopping reloader process [20736]
-(.venv) PS C:\dev\flutter_projects\dhuanrader\backend> uvicorn main:app --reload       
-INFO:     Will watch for changes in these directories: ['C:\\dev\\flutter_projects\\dhuanrader\\backend']
-INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [34120] using StatReload
-ERROR:    Error loading ASGI app. Could not import module "main".
-INFO:     Stopping reloader process [34120]
-(.venv) PS C:\dev\flutter_projects\dhuanrader\backend> identify the error 
-create a readme file 
-🔍 Error Identification
-
-The error occurred:
-
-ERROR: Error loading ASGI app. Could not import module "main".
-
-because you ran:
-
-bash
-uvicorn main:app --reload
-
-In your project structure, main.py is inside the app/ directory (app/main.py), rather than in the root of backend/. Uvicorn therefore searched for a file named main.py in the current working directory and could not find it.
-
-✅ Solution
-
-Run Uvicorn by pointing to the app package path:
-
-bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-
-Once started:
-
-Interactive OpenAPI / Swagger Docs: http://localhost:8000/docs
-Direct Briefing Endpoint: http://localhost:8000/briefing?lat=30.3421&lon=76.3812
-System Health Diagnostics: http://localhost:8000/api/v1/health
-📄 Comprehensive README Created
-
-A complete Master README.md has been created. It covers:
-
-Quick Fix Section: Highlights the Uvicorn command syntax.
-Step-by-Step Execution Guide:
-Starting the FastAPI backend with .venv and Uvicorn.
-Running the Flutter frontend on Chrome (flutter run -d chrome), Windows desktop, or Android emulator.
-Architecture & File Distribution: Detailed layout of both backend/ and Flutter lib/.
-Data Reality & Sources:
-NASA FIRMS: Live API + bundled sample CSV fallback (app/data/sample_firms_hotspots.csv).
-Open-Meteo: 10m wind speed, direction, and calm air detection.
-TinyFish Search → Fetch: Safe health advisory extraction.
-Rules Engine Verification: Slide 5 Example A and Example B unit tests breakdown.
-Field Reports & Downwind Relay: One-tap ground checks and unverified relay safeguards.
-# 🌫️ DhuanRadar - Full Stack System (FastAPI + Flutter)
 > **From Fire Detection to Local Smoke Awareness**  
 > *Tonight’s possible smoke risk, how sure we are, and the next step for ASHA/ANM workers.*  
 > **Team ByteForge:** Nidhish Gupta · Bitthal Bhai Vinayak · Utkarsh Trivedi
+
 ---
-## ⚡ Quick Fix for Common Startup Error
-If you encountered:
+
+## 📌 Project Overview
+
+Fire detection satellites (such as NASA FIRMS) detect hotspots, while central pollution agencies (CPCB, SAFAR) report city-wide AQI. However, **rural health workers (ASHA/ANM) have never had a same-day, village-level smoke briefing with stated confidence and actionable next steps**.
+
+**DhuanRadar** bridges this gap:
+1. **Inputs:** NASA FIRMS fire hotspots + Open-Meteo real-time wind vectors (10m) + TinyFish official health advisories.
+2. **Transparent Rules Engine:** Generates explainable **Risk** (`Low`, `Moderate`, `High`, `Unknown`), **Confidence** (`Low`, `Medium`, `High`), and transparent point breakdowns (no black-box AI).
+3. **Official Advisory:** Retrieved safely via TinyFish Search & Fetch pipeline without blocking briefing latency.
+4. **ASHA Feedback & Downwind Relay:** One-tap field reports ("Fire nearby", "Heavy smoke", "Smoke seen", "No smoke") relayed to downwind villages as unverified heads-up alerts.
+5. **Mobile-Ready:** Built in FastAPI with full CORS support and bilingual (English + Hindi) fields ready for seamless Flutter integration.
+
+---
+
+## 🏗️ Project Architecture & Directory Structure
+
 ```
-ERROR: Error loading ASGI app. Could not import module "main".
+backend/
+├── app/
+│   ├── __init__.py
+│   ├── main.py                     # FastAPI app, CORS, lifespan, root /briefing endpoint
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── config.py               # Pydantic Settings & environment configuration
+│   │   └── logging.py              # Structured logging
+│   ├── schemas/
+│   │   ├── __init__.py
+│   │   ├── briefing.py             # BriefingResponse, RiskLevel, ConfidenceLevel, ExposureArea, UITheme
+│   │   ├── weather.py              # WeatherData, WindVector
+│   │   ├── hotspot.py              # Hotspot, HotspotSummary
+│   │   ├── advisory.py             # AdvisoryResponse, AdvisoryStatus
+│   │   └── report.py               # FieldReportCreate, FieldReportResponse, DownwindRelayAlert
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── rules_engine.py         # Slide 4 & 5 Rule Engine (points, data gaps, next steps)
+│   │   ├── weather_service.py      # Open-Meteo integration, Haversine & wind transport calculations
+│   │   ├── firms_service.py        # NASA FIRMS live API + bundled sample CSV fallback
+│   │   ├── tinyfish_service.py     # TinyFish Search -> Fetch -> Validate pipeline
+│   │   ├── report_service.py       # Ground check reports & downwind relay alerting
+│   │   └── briefing_service.py     # Orchestrator aggregating signals into briefing response
+│   ├── api/
+│   │   ├── __init__.py
+│   │   └── v1/
+│   │       ├── __init__.py
+│   │       ├── router.py           # API v1 aggregator
+│   │       └── endpoints/
+│   │           ├── briefing.py     # GET /api/v1/briefing
+│   │           ├── reports.py      # POST & GET /api/v1/reports
+│   │           ├── relay.py        # GET /api/v1/relay
+│   │           ├── advisory.py     # GET /api/v1/advisory
+│   │           └── health.py       # GET /api/v1/health
+│   └── data/
+│       └── sample_firms_hotspots.csv # Bundled Punjab/Haryana/Delhi fire observations
+├── tests/
+│   ├── test_rules_engine.py        # Slide 5 Example A & B Unit Tests
+│   ├── test_briefing_api.py        # /briefing endpoint tests
+│   ├── test_firms_service.py       # Hotspot parsing & spatial calculations
+│   ├── test_reports_relay.py       # Field feedback & downwind relay tests
+│   └── test_tinyfish.py            # Advisory retrieval & fallback tests
+├── .env.example                    # Environment variable template
+├── .env                            # Active environment configuration
+├── requirements.txt                # Python dependencies
+└── README.md
 ```
-**Cause**: The FastAPI application file is located inside the `app/` folder (`app/main.py`), not directly at the root of `backend/`.  
-**Solution**: Always specify `app.main:app` instead of `main:app`:
+
+---
+
+## ⚡ Quick Start
+
+### 1. Requirements
+- Python 3.10+
+- pip
+
+### 2. Install Dependencies
 ```bash
-# Correct command:
+pip install -r requirements.txt
+```
+
+### 3. Run Development Server
+```bash
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
----
-## 📌 Project Overview
-Fire detection satellites (such as NASA FIRMS) detect hotspots, while central pollution agencies (CPCB, SAFAR) report city-wide AQI. However, **rural health workers (ASHA/ANM) have never had a same-day, village-level smoke briefing with stated confidence and actionable next steps**.
-**DhuanRadar** bridges this gap:
-1. **Data Inputs:** NASA FIRMS fire hotspots + Open-Meteo real-time 10m wind vectors + TinyFish official health advisories.
-2. **Transparent Rules Engine (Slides 4 & 5):** Generates explainable **Risk** (`Low`, `Moderate`, `High`, `Unknown`), **Confidence** (`Low`, `Medium`, `High`), and transparent point breakdowns (no black-box AI).
-3. **Official Health Advisories (Slide 6):** Retrieved safely via TinyFish Search & Fetch pipeline without blocking briefing latency.
-4. **ASHA Feedback & Downwind Relay (Slide 7):** One-tap field reports ("Fire nearby", "Heavy smoke", "Smoke seen", "No smoke") relayed to downwind villages as unverified heads-up alerts.
-5. **Flutter Frontend:** Interactive bilingual UI (English / Hindi), offline resilience, location presets, and one-tap ground check logging.
----
-## 🏗️ Project Architecture & Directory Structure
+- Interactive Swagger UI: `http://localhost:8000/docs`
+- Direct Briefing: `http://localhost:8000/briefing?lat=30.3421&lon=76.3812`
+- Health Status: `http://localhost:8000/api/v1/health`
+
+### 4. Run Unit Tests
+```bash
+pytest tests/ -v
 ```
-├── backend/
-│   ├── app/
-│   │   ├── main.py                     # FastAPI app, CORS, root /briefing endpoint
-│   │   ├── core/
-│   │   │   ├── config.py               # Pydantic Settings & environment configuration
+
+---
+
+## 🛰️ NASA FIRMS & Bundled Sample Data
+
+> [!NOTE]
+> **Sample Data Bundled for Instant Out-of-the-Box Execution**:
+> NASA FIRMS requires a free `MAP_KEY` from [NASA Earthdata](https://firms.modaps.eosdis.nasa.gov/api/map_key/).
+> To ensure the backend runs immediately without requiring an API key, **a realistic sample CSV is bundled at `app/data/sample_firms_hotspots.csv`** containing VIIRS satellite hotspot detections across Punjab, Haryana, and Delhi NCR.
+>
+> When `FIRMS_MAP_KEY` is provided in `.env`, the backend automatically calls the live NASA FIRMS API. If the key is omitted or the network call fails, the system automatically falls back to the bundled sample CSV.
+
+---
+
+## 🎣 TinyFish Advisory: Search → Fetch Pipeline
+
+As specified in **Slide 6** (*"TinyFish: verified advisories, fetched safely"*):
+1. **Search:** TinyFish finds official health and air quality pages (MoHFW, CPCB, NCDC).
+2. **Fetch:** TinyFish pulls the full page content from the top URLs.
+3. **Validate:** FastAPI checks approved government domains (`mohfw.gov.in`, `cpcb.nic.in`, `ncdc.gov.in`), date freshness, and relevance.
+4. **Resilience:** *"Briefing never waits on advisory retrieval."*
+   - Asynchronous execution with a short timeout and in-memory cache guarantees sub-500ms response times.
+   - If an advisory cannot be retrieved or is unavailable, the briefing continues seamlessly and displays: `"No current verified advisory retrieved."`
+
+---
+
+## 📐 Transparent Rules Engine (Slide 4 & 5 Verification)
+
+The rules engine does not use a black box. It maps clear signals to explainable points:
+
+| Signal | Proposed Rule | Effect |
+| :--- | :--- | :--- |
+| **Nearby hotspots** | Recent observations within distance bands (0–25 km, 25–50 km) | +1 point per hotspot (Raise risk) |
+| **Wind direction** | Towards the area, if reliable weather data confirms it | +1 point (Raise risk) |
+| **Calm air** | Low wind speed (< 5 km/h) | Considered separately (potential smoke build-up), not proof of transport |
+| **Stale or missing data** | Satellite data older than freshness window, missing wind data | Lowers confidence. No valid hotspots → Risk **Unknown** |
+
+### Verified Deck Unit Tests (`tests/test_rules_engine.py`):
+
+#### **Example A (Slide 5)**:
+- **Observation:** 2 nearby hotspots (+2 points), Wind direction uncertain (0 points).
+- **Total Points:** 2
+- **Resulting Risk:** `MODERATE` (2–3 points)
+- **Key Data Gaps:** Wind direction uncertain, weather data incomplete.
+- **Resulting Confidence:** `LOW` (2 data gaps: High → Medium → Low)
+- **Next Step:** *"Share the dated official advisory with the village. Watch field reports."*
+
+#### **Example B (Slide 5)**:
+- **Observation:** No valid recent hotspot data (satellite data older than freshness window) → N/A, Wind direction unknown → N/A.
+- **Total Points:** N/A (`None`)
+- **Resulting Risk:** `UNKNOWN` (Cannot assess)
+- **Key Data Gaps:** Satellite data older than freshness window, weather data missing.
+- **Resulting Confidence:** `LOW`
+- **Next Step:** *"Data is limited. No alert ≠ no smoke. Use your own observation and official guidance."*
+
+---
+
+## 🌐 API Endpoints Reference
+
+### 1. `GET /briefing` (and `GET /api/v1/briefing`)
+**Query Parameters:**
+- `lat` (float, required): Village latitude (e.g. `30.3421`)
+- `lon` (float, required): Village longitude (e.g. `76.3812`)
+- `village_name` (string, optional): Village name (e.g. `"Samana Cluster"`)
+- `radius_km` (float, default: `50.0`): Search radius
+- `freshness_hours` (float, default: `24.0`): Freshness window
+
+**Sample Response:**
+```json
+{
+  "village_name": "Samana Cluster",
+  "latitude": 30.3421,
+  "longitude": 76.3812,
+  "briefing_time": "2026-10-20T14:45:00Z",
+  "risk_level": "Moderate",
+  "risk_level_hi": "मध्यम (Moderate)",
+  "confidence": "Low",
+  "confidence_hi": "निम्न (Low)",
+  "reason": "Moderate smoke risk (2 points). Wind direction uncertain, weather data incomplete.",
+  "reason_hi": "मध्यम धुआं जोखिम (2 अंक)। मौसम या हवा की दिशा अनिश्चित है, लेकिन पास में 2 या अधिक सक्रिय हॉटस्पॉट हैं।",
+  "next_step": "Share the dated official advisory with the village. Watch field reports.",
+  "next_step_hi": "गांव के साथ दिनांकित आधिकारिक सलाह साझा करें। जमीनी रिपोर्टों पर नज़र रखें।",
+  "key_data_gaps": [
+    "Weather data incomplete or missing",
+    "Wind direction uncertain"
+  ],
+  "scoring": {
+    "hotspot_points": 2,
+    "wind_direction_points": 0,
+    "total_points": 2
+  },
+  "exposure_area": {
+    "area_type": "Coarse area (village / cluster)",
+    "center_lat": 30.3421,
+    "center_lon": 76.3812,
+    "radius_km": 25.0,
+    "label": "Coarse area, not a smoke path",
+    "label_hi": "मोटा क्षेत्र, न कि सटीक धुआं पथ"
+  },
+  "official_advisory": {
+    "status": "VERIFIED",
+    "title": "MoHFW/NCDC Health Advisory on Air Pollution & Smoke",
+    "summary": "Updated 2025 health advisory advises state health systems and community workers...",
+    "issued_date": "1 Nov 2025",
+    "source_name": "MoHFW/NCDC (NPCCHH)",
+    "notice": "Official source and dated"
+  },
+  "ui_theme": {
+    "risk_color_hex": "#FB8C00",
+    "risk_bg_hex": "#FFF3E0",
+    "risk_icon": "alert-triangle",
+    "confidence_color_hex": "#D32F2F"
+  },
+  "disclaimer": "Health guidance comes only from official advisories. DhuanRadar does not give medical advice. No alert ≠ no smoke."
+}
+```
+
+### 2. `POST /api/v1/reports`
+Submit one-tap ground check from ASHA worker:
+```json
+{
+  "worker_id": "ASHA-PB-042",
+  "worker_role": "ASHA",
+  "village_name": "Samana",
+  "latitude": 30.3421,
+  "longitude": 76.3812,
+  "report_type": "FIRE_NEARBY",
+  "notes": "Small residue fire observed along western field boundary"
+}
+```
+
+### 3. `GET /api/v1/relay?lat=30.30&lon=76.38`
+Checks if an unverified field report from an upwind village should be relayed to health workers in downwind areas.
+
+### 4. `GET /api/v1/health`
+Health check diagnostics returning active data source modes (Live vs Bundled Sample CSV, TinyFish, Open-Meteo).
+
+---
+
+## 📱 Flutter Frontend Integration Notes
+
+When building the Flutter frontend:
+- **Base URL for Android Emulator:** `http://10.0.2.2:8000`
+- **Base URL for iOS Simulator / Web / Desktop:** `http://localhost:8000`
+- **UI Themes Included in JSON:** `ui_theme.risk_color_hex` and `ui_theme.risk_icon` provide direct styling variables for Flutter cards.
+- **Bilingual Support:** Every response contains pre-translated Hindi fields (`risk_level_hi`, `reason_hi`, `next_step_hi`, `summary_hi`) for rural ASHA workers.
+- **CORS Configured:** Backend accepts cross-origin requests from any origin (`*`).
